@@ -1,0 +1,244 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dice Roll Simulator</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #10172a, #243b68);
+    color: white;
+}
+
+.container {
+    width: 90%;
+    max-width: 400px;
+    padding: 30px 25px;
+    text-align: center;
+    border-radius: 24px;
+    background: rgba(255,255,255,0.09);
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+}
+
+h1 {
+    font-size: 27px;
+}
+
+.subtitle {
+    color: #c5d1eb;
+    margin-bottom: 30px;
+}
+
+/* Dice box */
+.dice {
+    width: 150px;
+    height: 150px;
+    margin: 25px auto;
+    padding: 18px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    background: #ffffff;
+    border-radius: 25px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
+
+/* Individual black dots */
+.dot {
+    width: 20px;
+    height: 20px;
+    background: #000000 !important;
+    border-radius: 50%;
+    display: block;
+    justify-self: center;
+    align-self: center;
+}
+
+.rolling {
+    animation: shake 0.12s infinite;
+}
+
+@keyframes shake {
+    0%   { transform: rotate(0deg); }
+    25%  { transform: rotate(8deg); }
+    50%  { transform: rotate(-8deg); }
+    75%  { transform: rotate(5deg); }
+    100% { transform: rotate(0deg); }
+}
+
+.result {
+    font-size: 20px;
+    font-weight: bold;
+    min-height: 28px;
+}
+
+.counter {
+    color: #c5d1eb;
+    margin: 15px 0 25px;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.roll-button {
+    background: #6288ff;
+    color: white;
+}
+
+.reset-button {
+    background: white;
+    color: #243b68;
+}
+
+button:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+footer {
+    margin-top: 22px;
+    font-size: 12px;
+    color: #b7c5e4;
+}
+</style>
+</head>
+
+<body>
+
+<main class="container">
+
+    <h1>🎲 Dice Roll Simulator</h1>
+    <p class="subtitle">Test your luck with a roll!</p>
+
+    <div class="dice" id="dice"
+         role="img" aria-label="Dice showing one"></div>
+
+    <div class="result" id="result" aria-live="polite">
+        Ready to roll?
+    </div>
+
+    <div class="counter" id="counter">Total Rolls: 0</div>
+
+    <button class="roll-button" id="rollButton" onclick="rollDice()">
+        🎲 ROLL DICE
+    </button>
+
+    <button class="reset-button" onclick="resetGame()">
+        ↻ RESET
+    </button>
+
+    <footer>Built with HTML, CSS &amp; JavaScript</footer>
+
+</main>
+
+<script>
+let totalRolls = 0;
+let rolling = false;
+
+const patterns = {
+    1: [4],
+    2: [0, 8],
+    3: [0, 4, 8],
+    4: [0, 2, 6, 8],
+    5: [0, 2, 4, 6, 8],
+    6: [0, 2, 3, 5, 6, 8]
+};
+
+function displayDice(number) {
+    const dice = document.getElementById("dice");
+
+    // Remove previous dots
+    dice.innerHTML = "";
+
+    // Create nine positions
+    for (let i = 0; i < 9; i++) {
+        const cell = document.createElement("div");
+
+        // Add a black dot at the required positions
+        if (patterns[number].includes(i)) {
+            const dot = document.createElement("span");
+            dot.classList.add("dot");
+            cell.appendChild(dot);
+        }
+
+        dice.appendChild(cell);
+    }
+
+    dice.setAttribute("aria-label", "Dice showing " + number);
+}
+
+function rollDice() {
+    if (rolling) return;
+
+    rolling = true;
+
+    const dice = document.getElementById("dice");
+    const result = document.getElementById("result");
+    const counter = document.getElementById("counter");
+    const button = document.getElementById("rollButton");
+
+    button.disabled = true;
+    result.textContent = "Rolling...";
+    dice.classList.add("rolling");
+
+    const animation = setInterval(function() {
+        const randomNumber = Math.floor(Math.random() * 6) + 1;
+        displayDice(randomNumber);
+    }, 100);
+
+    setTimeout(function() {
+        clearInterval(animation);
+
+        const number = Math.floor(Math.random() * 6) + 1;
+
+        displayDice(number);
+        dice.classList.remove("rolling");
+
+        totalRolls++;
+
+        result.textContent = "You rolled a " + number + "!";
+        counter.textContent = "Total Rolls: " + totalRolls;
+
+        button.disabled = false;
+        rolling = false;
+    }, 900);
+}
+
+function resetGame() {
+    if (rolling) return;
+
+    totalRolls = 0;
+    displayDice(1);
+
+    document.getElementById("result").textContent = "Ready to roll?";
+    document.getElementById("counter").textContent = "Total Rolls: 0";
+}
+
+// Display one black dot when the page loads
+displayDice(1);
+</script>
+
+</body>
+</html>
+```
